@@ -1,6 +1,8 @@
 #include "login.h"
 #include "ui_login.h"
 #include <QPixmap>
+#include "playground.h"
+#include <QMessageBox>
 
 LogIn::LogIn(QWidget *parent) :
     QMainWindow(parent),
@@ -15,4 +17,20 @@ LogIn::LogIn(QWidget *parent) :
 LogIn::~LogIn()
 {
     delete ui;
+}
+
+void LogIn::on_buttonLogin_clicked()
+{
+    QString user = ui->lineUser->text();
+    QString password = ui->linePassword->text();
+    if(user == "user" && password == "pass"){
+        Playground playground;
+        hide();
+        playground.setModal(true);
+        playground.exec();
+    }
+    else {
+        QMessageBox::information(this,"Error","Credenciales incorrectas");
+    }
+
 }
