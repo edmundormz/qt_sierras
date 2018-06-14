@@ -32,3 +32,6 @@ HEADERS += \
 
 FORMS += \
         login.ui
+
+RESOURCES += \
+    resources.qrc
