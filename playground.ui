@@ -88,8 +88,8 @@
   <widget class="QFrame" name="frame_2">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>60</y>
+     <x>290</x>
+     <y>130</y>
      <width>211</width>
      <height>65</height>
     </rect>
@@ -132,8 +132,8 @@
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>130</y>
+     <x>290</x>
+     <y>60</y>
      <width>211</width>
      <height>65</height>
     </rect>
@@ -162,7 +162,7 @@
      <string>Material length</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEditRemaining">
+   <widget class="QLineEdit" name="lineEditMaterialLength">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -206,7 +206,7 @@
      <string>Material Type</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBoxDiscType_2">
+   <widget class="QComboBox" name="comboBoxMaterialType">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -374,7 +374,7 @@
      <string>Execution command</string>
     </property>
    </widget>
-   <widget class="QLabel" name="lbRemainingMaterial_2">
+   <widget class="QLabel" name="lbCommand">
     <property name="geometry">
      <rect>
       <x>10</x>

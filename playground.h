@@ -14,9 +14,16 @@ class Playground : public QDialog
 public:
     explicit Playground(QWidget *parent = 0);
     ~Playground();
+    float remaining;
 
 private slots:
     void on_pbExit_clicked();
+
+    void on_pbCut_clicked();
+
+    void on_pbStop_clicked();
+
+    void on_lineEditMaterialLength_textEdited(const QString &arg1);
 
 private:
     Ui::Playground *ui;
