@@ -23,7 +23,7 @@ void LogIn::on_buttonLogin_clicked()
 {
     QString user = ui->lineUser->text();
     QString password = ui->linePassword->text();
-    if(user == "user" && password == "pass"){
+    if(user == "" && password == ""){
         Playground playground;
         hide();
         playground.setModal(true);

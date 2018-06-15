@@ -12,3 +12,8 @@ Playground::~Playground()
 {
     delete ui;
 }
+
+void Playground::on_pbExit_clicked()
+{
+    this->close();
+}
