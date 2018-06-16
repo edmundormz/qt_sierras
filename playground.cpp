@@ -11,6 +11,8 @@ Playground::Playground(QWidget *parent) :
     //remaining = ui->lineEditMaterialLength->text().toFloat();
     //remaining = 100;
     //qDebug() << "remaining =" << remaining;
+
+    //qApp->setStyleSheet();
 }
 
 Playground::~Playground()
@@ -47,6 +49,10 @@ void Playground::on_pbCut_clicked()
         float to_cut = ui->lineEditCutLength->text().toFloat();
         qDebug() << "remaining =" << remaining;
         qDebug() << "to cut =" << to_cut;
+        QString foo = "foo";
+        QString bar = "bar";
+        QString zen = foo + bar;
+        qDebug() << "zen = " << zen;
         if(to_cut < remaining){
             remaining = remaining - disc - to_cut;
             ui->lbRemainingMaterial->setText(QString::number(remaining));
