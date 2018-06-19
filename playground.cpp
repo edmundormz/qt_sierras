@@ -1,16 +1,52 @@
 #include "playground.h"
 #include "ui_playground.h"
+#include <QSerialPort>
+#include <QSerialPortInfo>
 #include <QMessageBox>
-#include <QtDebug>
+#include <QDebug>
+#include <QTimer>
+
+void Playground::fTimer(){
+    if(hw_is_available && hw->isWritable()){
+        hw->write("a");
+        if(hw->isReadable()){
+            QByteArray datosLeidos = hw->read(2);
+            int ADC_Digital = datosLeidos.toHex().toInt(0,16);
+            float ADC_Flotante = (5*(float)ADC_Digital/1023);
+            //SOMETHING TO DO WITH SERIAL INFO
+        }
+    }
+}
 
 Playground::Playground(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Playground)
 {
     ui->setupUi(this);
-    //remaining = ui->lineEditMaterialLength->text().toFloat();
-    //remaining = 100;
-    //qDebug() << "remaining =" << remaining;
+
+    QTimer *cronometro = new QTimer(this);
+    connect(cronometro, SIGNAL(timeout()),this, SLOT(fTimer()));
+    cronometro->start(100);
+
+    hw_is_available = false;
+    hw_port_name = "";
+    hw = new QSerialPort;
+    ui->lineEditBaudRate->setText("9600");
+    ui->lineEditNPorts->setText(QString::number(QSerialPortInfo::availablePorts().length()));
+    foreach (const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()) {
+        if(serialPortInfo.hasVendorIdentifier() && serialPortInfo.hasProductIdentifier()){
+            ui->lineEditVendorID->setText(QString::number(serialPortInfo.vendorIdentifier()));
+            ui->lineEditProductID->setText(QString::number(serialPortInfo.productIdentifier()));
+            hw_port_name = serialPortInfo.portName();
+            hw_is_available = true;
+        }
+    }
+
+    foreach (const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()) {
+        ui->comboBoxPort->addItem(serialPortInfo.portName());
+    }
+
+    //qApp->setStyleSheet();
 }
 
 Playground::~Playground()
@@ -20,6 +56,7 @@ Playground::~Playground()
 
 void Playground::on_pbExit_clicked()
 {
+    hw->close();
     this->close();
 }
 
@@ -31,7 +68,7 @@ void Playground::on_pbCut_clicked()
         QMessageBox::information(this,"Error","Unnapropiate disc for metal");
     }
     else {
-        float disc = 0;
+        disc = 0;
         switch (ui->comboBoxDiscType->currentIndex()){
         case 0:
             disc = 1;
@@ -45,8 +82,13 @@ void Playground::on_pbCut_clicked()
         }
 
         float to_cut = ui->lineEditCutLength->text().toFloat();
-        qDebug() << "remaining =" << remaining;
-        qDebug() << "to cut =" << to_cut;
+        //Command log
+        QString command;
+        command += "D" + QString::number(disc);
+        command += "M" + QString::number(ui->comboBoxMaterialType->currentIndex());
+        command += "C" + ui->lineEditCutLength->text();
+        ui->lbCommand->setText(command);
+
         if(to_cut < remaining){
             remaining = remaining - disc - to_cut;
             ui->lbRemainingMaterial->setText(QString::number(remaining));
@@ -56,7 +98,6 @@ void Playground::on_pbCut_clicked()
             QMessageBox::information(this,"Error","Unsufficient material");
         }
     }
-
 }
 
 void Playground::on_pbStop_clicked()
@@ -68,4 +109,24 @@ void Playground::on_pbStop_clicked()
 void Playground::on_lineEditMaterialLength_textEdited(const QString &arg1)
 {
     remaining = ui->lineEditMaterialLength->text().toFloat();
+}
+
+void Playground::on_pbConnect_clicked()
+{
+    int bauds = ui->lineEditBaudRate->text().toInt();
+    if(bauds == 9600){
+        hw->setBaudRate(QSerialPort::Baud9600);
+        ui->lineEditBaudRate_2->setText(QString::number(bauds));
+    }
+    if(hw_is_available){
+        hw->setPortName(hw_port_name);
+        hw->open(QIODevice::ReadWrite);
+        hw->setDataBits(QSerialPort::Data8);
+        hw->setParity(QSerialPort::NoParity);
+        hw->setStopBits(QSerialPort::OneStop);
+        hw->setFlowControl(QSerialPort::NoFlowControl);
+    }
+    else {
+        QMessageBox::information(this,"Error","Serial port not available");
+    }
 }
