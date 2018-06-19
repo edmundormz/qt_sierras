@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tabConnection">
     <attribute name="title">
@@ -594,7 +594,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <widget class="QLabel" name="lbRemaining_2">
+     <widget class="QLabel" name="lbCommand_2">
       <property name="geometry">
        <rect>
         <x>10</x>

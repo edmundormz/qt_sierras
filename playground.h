@@ -39,6 +39,7 @@ private:
     QSerialPort *hw;
     QString hw_port_name;
     bool hw_is_available;
+    float disc;
 };
 
 #endif // PLAYGROUND_H

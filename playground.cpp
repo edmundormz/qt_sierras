@@ -49,8 +49,6 @@ Playground::Playground(QWidget *parent) :
     //qApp->setStyleSheet();
 }
 
-
-
 Playground::~Playground()
 {
     delete ui;
@@ -70,7 +68,7 @@ void Playground::on_pbCut_clicked()
         QMessageBox::information(this,"Error","Unnapropiate disc for metal");
     }
     else {
-        float disc = 0;
+        disc = 0;
         switch (ui->comboBoxDiscType->currentIndex()){
         case 0:
             disc = 1;
@@ -84,12 +82,13 @@ void Playground::on_pbCut_clicked()
         }
 
         float to_cut = ui->lineEditCutLength->text().toFloat();
-        qDebug() << "remaining =" << remaining;
-        qDebug() << "to cut =" << to_cut;
-        QString foo = "foo";
-        QString bar = "bar";
-        QString zen = foo + bar;
-        qDebug() << "zen = " << zen;
+        //Command log
+        QString command;
+        command += "D" + QString::number(disc);
+        command += "M" + QString::number(ui->comboBoxMaterialType->currentIndex());
+        command += "C" + ui->lineEditCutLength->text();
+        ui->lbCommand->setText(command);
+
         if(to_cut < remaining){
             remaining = remaining - disc - to_cut;
             ui->lbRemainingMaterial->setText(QString::number(remaining));
@@ -99,7 +98,6 @@ void Playground::on_pbCut_clicked()
             QMessageBox::information(this,"Error","Unsufficient material");
         }
     }
-
 }
 
 void Playground::on_pbStop_clicked()
