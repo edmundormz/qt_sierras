@@ -1,7 +1,7 @@
 #include "playground.h"
 #include "ui_playground.h"
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 #include <QMessageBox>
 #include <QDebug>
 #include <QTimer>
