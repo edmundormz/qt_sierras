@@ -42,8 +42,14 @@ Playground::Playground(QWidget *parent) :
         }
     }
 
+    foreach (const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()) {
+        ui->comboBoxPort->addItem(serialPortInfo.portName());
+    }
+
     //qApp->setStyleSheet();
 }
+
+
 
 Playground::~Playground()
 {
@@ -52,6 +58,7 @@ Playground::~Playground()
 
 void Playground::on_pbExit_clicked()
 {
+    hw->close();
     this->close();
 }
 
@@ -104,4 +111,24 @@ void Playground::on_pbStop_clicked()
 void Playground::on_lineEditMaterialLength_textEdited(const QString &arg1)
 {
     remaining = ui->lineEditMaterialLength->text().toFloat();
+}
+
+void Playground::on_pbConnect_clicked()
+{
+    int bauds = ui->lineEditBaudRate->text().toInt();
+    if(bauds == 9600){
+        hw->setBaudRate(QSerialPort::Baud9600);
+        ui->lineEditBaudRate_2->setText(QString::number(bauds));
+    }
+    if(hw_is_available){
+        hw->setPortName(hw_port_name);
+        hw->open(QIODevice::ReadWrite);
+        hw->setDataBits(QSerialPort::Data8);
+        hw->setParity(QSerialPort::NoParity);
+        hw->setStopBits(QSerialPort::OneStop);
+        hw->setFlowControl(QSerialPort::NoFlowControl);
+    }
+    else {
+        QMessageBox::information(this,"Error","Serial port not available");
+    }
 }

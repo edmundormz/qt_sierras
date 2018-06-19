@@ -65,9 +65,9 @@
      <widget class="QComboBox" name="comboBoxPort">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>62</x>
         <y>20</y>
-        <width>83</width>
+        <width>121</width>
         <height>31</height>
        </rect>
       </property>
@@ -310,7 +310,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QPushButton" name="pbCut_2">
+    <widget class="QPushButton" name="pbConnect">
      <property name="geometry">
       <rect>
        <x>540</x>

@@ -29,6 +29,10 @@ private slots:
     void on_lineEditMaterialLength_textEdited(const QString &arg1);
     void fTimer();
 
+    void on_pbCut_2_clicked();
+
+    void on_pbConnect_clicked();
+
 private:
     Ui::Playground *ui;
 
