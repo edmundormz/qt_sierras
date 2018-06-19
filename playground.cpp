@@ -1,16 +1,46 @@
 #include "playground.h"
 #include "ui_playground.h"
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include <QMessageBox>
-#include <QtDebug>
+#include <QDebug>
+#include <QTimer>
+
+void Playground::fTimer(){
+    if(hw_is_available && hw->isWritable()){
+        hw->write("a");
+        if(hw->isReadable()){
+            QByteArray datosLeidos = hw->read(2);
+            int ADC_Digital = datosLeidos.toHex().toInt(0,16);
+            float ADC_Flotante = (5*(float)ADC_Digital/1023);
+            //SOMETHING TO DO WITH SERIAL INFO
+        }
+    }
+}
 
 Playground::Playground(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Playground)
 {
     ui->setupUi(this);
-    //remaining = ui->lineEditMaterialLength->text().toFloat();
-    //remaining = 100;
-    //qDebug() << "remaining =" << remaining;
+
+    QTimer *cronometro = new QTimer(this);
+    connect(cronometro, SIGNAL(timeout()),this, SLOT(fTimer()));
+    cronometro->start(100);
+
+    hw_is_available = false;
+    hw_port_name = "";
+    hw = new QSerialPort;
+    ui->lineEditBaudRate->setText("9600");
+    ui->lineEditNPorts->setText(QString::number(QSerialPortInfo::availablePorts().length()));
+    foreach (const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()) {
+        if(serialPortInfo.hasVendorIdentifier() && serialPortInfo.hasProductIdentifier()){
+            ui->lineEditVendorID->setText(QString::number(serialPortInfo.vendorIdentifier()));
+            ui->lineEditProductID->setText(QString::number(serialPortInfo.productIdentifier()));
+            hw_port_name = serialPortInfo.portName();
+            hw_is_available = true;
+        }
+    }
 
     //qApp->setStyleSheet();
 }

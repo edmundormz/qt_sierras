@@ -3,9 +3,12 @@
 
 #include <QDialog>
 
+
 namespace Ui {
 class Playground;
 }
+
+class QSerialPort;
 
 class Playground : public QDialog
 {
@@ -24,9 +27,14 @@ private slots:
     void on_pbStop_clicked();
 
     void on_lineEditMaterialLength_textEdited(const QString &arg1);
+    void fTimer();
 
 private:
     Ui::Playground *ui;
+
+    QSerialPort *hw;
+    QString hw_port_name;
+    bool hw_is_available;
 };
 
 #endif // PLAYGROUND_H

@@ -231,7 +231,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <widget class="QLineEdit" name="lineEditVendorID_2">
+     <widget class="QLineEdit" name="lineEditProductID">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -278,7 +278,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <widget class="QLineEdit" name="lineEditVendorID_3">
+     <widget class="QLineEdit" name="lineEditBaudRate_2">
       <property name="enabled">
        <bool>false</bool>
       </property>
