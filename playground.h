@@ -2,6 +2,7 @@
 #define PLAYGROUND_H
 
 #include <QDialog>
+#include <QDate>
 
 
 namespace Ui {
@@ -40,6 +41,8 @@ private:
     QString hw_port_name;
     bool hw_is_available;
     float disc;
+    QDate date;
+
 };
 
 #endif // PLAYGROUND_H

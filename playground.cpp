@@ -5,14 +5,18 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QTimer>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QIODevice>
 
 void Playground::fTimer(){
     if(hw_is_available && hw->isWritable()){
         hw->write("a");
         if(hw->isReadable()){
             QByteArray datosLeidos = hw->read(2);
-            int ADC_Digital = datosLeidos.toHex().toInt(0,16);
-            float ADC_Flotante = (5*(float)ADC_Digital/1023);
+            //int ADC_Digital = datosLeidos.toHex().toInt(0,16);
+            //float ADC_Flotante = (5*(float)ADC_Digital/1023);
             //SOMETHING TO DO WITH SERIAL INFO
         }
     }
@@ -24,6 +28,7 @@ Playground::Playground(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    //Timer to check serial ports
     QTimer *cronometro = new QTimer(this);
     connect(cronometro, SIGNAL(timeout()),this, SLOT(fTimer()));
     cronometro->start(100);
@@ -84,14 +89,40 @@ void Playground::on_pbCut_clicked()
         float to_cut = ui->lineEditCutLength->text().toFloat();
         //Command log
         QString command;
-        command += "D" + QString::number(disc);
-        command += "M" + QString::number(ui->comboBoxMaterialType->currentIndex());
-        command += "C" + ui->lineEditCutLength->text();
+        command += "D" + QString::number(disc) + ",";
+        command += "M" + QString::number(ui->comboBoxMaterialType->currentIndex()) + ",";
+        command += "C" + ui->lineEditCutLength->text() + ",";
+        command += "R" + ui->lbRemainingMaterial->text();
         ui->lbCommand->setText(command);
 
         if(to_cut < remaining){
             remaining = remaining - disc - to_cut;
             ui->lbRemainingMaterial->setText(QString::number(remaining));
+
+            //Logging section
+            QString current_day = QString::number(date.currentDate().dayOfYear());
+            QString logs_dir_path = "/home/hecmundo/qt_logs";
+            //QString log_path = logs_dir_path + "/log_" + current_day + ".csv";
+
+            //Check if logs directory exists
+            if (!QDir(logs_dir_path).exists()){
+                QDir().mkdir(logs_dir_path);
+            }
+            //Check if current log file exists
+            QFile log_path(logs_dir_path + "/log_" + current_day + ".csv");
+            //if (log_path.open(QFile::WriteOnly | QFile::Text | QIODevice::Append)){
+            if (log_path.open(QIODevice::WriteOnly | QIODevice::Append)){
+                QTextStream out_log(&log_path);
+                QString log = command + "_" + current_day + "\n";
+                out_log << log;
+                log_path.flush();
+                log_path.close();
+            }
+            else {
+
+                //system(qPrintable("echo '" + log + "' >> " + log_path));
+            }
+
             QMessageBox::information(this,"Success","Cutting material");
         }
         else {
