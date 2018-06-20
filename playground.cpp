@@ -27,6 +27,8 @@ Playground::Playground(QWidget *parent) :
     ui(new Ui::Playground)
 {
     ui->setupUi(this);
+    QString hello = "Session started";
+    Logger(hello);
 
     //Timer to check serial ports
     QTimer *cronometro = new QTimer(this);
@@ -61,19 +63,21 @@ Playground::~Playground()
 
 void Playground::on_pbExit_clicked()
 {
+    QString regards = "Session closed";
+    Logger(regards);
     hw->close();
     this->close();
 }
 
 void Playground::on_pbCut_clicked()
 {
-    //qDebug() << "remaining =" << remaining;
     if(ui->comboBoxDiscType->currentText() == "3 mm"
             && ui->comboBoxMaterialType->currentText() == "Metal"){
-        QMessageBox::information(this,"Error","Unnapropiate disc for metal");
+        QString error_message = "Unnapropiate disc for metal";
+        QMessageBox::information(this,"Error", error_message);
+        Logger(error_message);
     }
     else {
-        disc = 0;
         switch (ui->comboBoxDiscType->currentIndex()){
         case 0:
             disc = 1;
@@ -94,34 +98,11 @@ void Playground::on_pbCut_clicked()
         command += "C" + ui->lineEditCutLength->text() + ",";
         command += "R" + ui->lbRemainingMaterial->text();
         ui->lbCommand->setText(command);
+        Logger(command);
 
         if(to_cut < remaining){
             remaining = remaining - disc - to_cut;
             ui->lbRemainingMaterial->setText(QString::number(remaining));
-
-            //Logging section
-            QString current_day = QString::number(date.currentDate().dayOfYear());
-            QString logs_dir_path = "/home/hecmundo/qt_logs";
-            //QString log_path = logs_dir_path + "/log_" + current_day + ".csv";
-
-            //Check if logs directory exists
-            if (!QDir(logs_dir_path).exists()){
-                QDir().mkdir(logs_dir_path);
-            }
-            //Check if current log file exists
-            QFile log_path(logs_dir_path + "/log_" + current_day + ".csv");
-            //if (log_path.open(QFile::WriteOnly | QFile::Text | QIODevice::Append)){
-            if (log_path.open(QIODevice::WriteOnly | QIODevice::Append)){
-                QTextStream out_log(&log_path);
-                QString log = command + "_" + current_day + "\n";
-                out_log << log;
-                log_path.flush();
-                log_path.close();
-            }
-            else {
-
-                //system(qPrintable("echo '" + log + "' >> " + log_path));
-            }
 
             QMessageBox::information(this,"Success","Cutting material");
         }
@@ -137,7 +118,7 @@ void Playground::on_pbStop_clicked()
 }
 
 
-void Playground::on_lineEditMaterialLength_textEdited(const QString &arg1)
+void Playground::on_lineEditMaterialLength_textEdited()
 {
     remaining = ui->lineEditMaterialLength->text().toFloat();
 }
@@ -156,8 +137,35 @@ void Playground::on_pbConnect_clicked()
         hw->setParity(QSerialPort::NoParity);
         hw->setStopBits(QSerialPort::OneStop);
         hw->setFlowControl(QSerialPort::NoFlowControl);
+        QString connected = "Connected to " + hw_port_name;
+        Logger(connected);
     }
     else {
-        QMessageBox::information(this,"Error","Serial port not available");
+        QString connection_error = "Serial port not available";
+        QMessageBox::information(this, "Error", connection_error);
+        Logger(connection_error);
+    }
+}
+
+void Playground::Logger(QString command){
+    QString current_day = QString::number(date.currentDate().dayOfYear());
+    QString logs_dir_path = "/home/hecmundo/qt_logs";
+
+    //Check if logs directory exists
+    if (!QDir(logs_dir_path).exists()){
+        QDir().mkdir(logs_dir_path);
+    }
+    //Check if current log file exists
+    QFile log_path(logs_dir_path + "/log_" + current_day + ".csv");
+    if (log_path.open(QIODevice::WriteOnly | QIODevice::Append)){
+        QTextStream out_log(&log_path);
+        QString log = command + "_" + current_day + "\n";
+        out_log << log;
+        log_path.flush();
+        log_path.close();
+    }
+    else {
+
+        QMessageBox::information(this, "Error", "Unable to open log file");
     }
 }

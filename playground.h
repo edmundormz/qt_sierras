@@ -27,12 +27,12 @@ private slots:
 
     void on_pbStop_clicked();
 
-    void on_lineEditMaterialLength_textEdited(const QString &arg1);
+    void on_lineEditMaterialLength_textEdited();
     void fTimer();
 
-    void on_pbCut_2_clicked();
-
     void on_pbConnect_clicked();
+
+    void Logger(QString command);
 
 private:
     Ui::Playground *ui;
@@ -40,7 +40,7 @@ private:
     QSerialPort *hw;
     QString hw_port_name;
     bool hw_is_available;
-    float disc;
+    float disc = 0;
     QDate date;
 
 };
