@@ -28,11 +28,14 @@ private slots:
     void on_pbStop_clicked();
 
     void on_lineEditMaterialLength_textEdited();
-    void fTimer();
+
+//    void fTimer();
 
     void on_pbConnect_clicked();
 
     void Logger(QString command);
+
+    void Serialer(QString instruction);
 
 private:
     Ui::Playground *ui;

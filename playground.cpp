@@ -10,17 +10,17 @@
 #include <QTextStream>
 #include <QIODevice>
 
-void Playground::fTimer(){
-    if(hw_is_available && hw->isWritable()){
-        hw->write("a");
-        if(hw->isReadable()){
-            QByteArray datosLeidos = hw->read(2);
-            //int ADC_Digital = datosLeidos.toHex().toInt(0,16);
-            //float ADC_Flotante = (5*(float)ADC_Digital/1023);
-            //SOMETHING TO DO WITH SERIAL INFO
-        }
-    }
-}
+//void Playground::fTimer(){
+//    if(hw_is_available && hw->isWritable()){
+//        hw->write("a");
+//        if(hw->isReadable()){
+//            QByteArray datosLeidos = hw->read(2);
+//            //int ADC_Digital = datosLeidos.toHex().toInt(0,16);
+//            //float ADC_Flotante = (5*(float)ADC_Digital/1023);
+//            //SOMETHING TO DO WITH SERIAL INFO
+//        }
+//    }
+//}
 
 Playground::Playground(QWidget *parent) :
     QDialog(parent),
@@ -31,10 +31,10 @@ Playground::Playground(QWidget *parent) :
     QString hello = "Session started";
     Logger(hello);
 
-    //Timer to check serial ports
-    QTimer *cronometro = new QTimer(this);
-    connect(cronometro, SIGNAL(timeout()),this, SLOT(fTimer()));
-    cronometro->start(100);
+//    //Timer to check serial ports
+//    QTimer *cronometro = new QTimer(this);
+//    connect(cronometro, SIGNAL(timeout()),this, SLOT(fTimer()));
+//    cronometro->start(100);
 
     hw_is_available = false;
     hw_port_name = "";
@@ -104,7 +104,8 @@ void Playground::on_pbCut_clicked()
         if(to_cut < remaining){
             remaining = remaining - disc - to_cut;
             ui->lbRemainingMaterial->setText(QString::number(remaining));
-
+            Serialer("A1111");
+            Logger("Cutting at " + QDateTime::currentDateTime().toString());
             QMessageBox::information(this,"Success","Cutting material");
         }
         else {
@@ -115,6 +116,8 @@ void Playground::on_pbCut_clicked()
 
 void Playground::on_pbStop_clicked()
 {
+    Serialer("A0000");
+    Logger("Stopped at " + QDateTime::currentDateTime().toString());
     QMessageBox::information(this,"System Stopped","Turning off system");
 }
 
@@ -171,5 +174,11 @@ void Playground::Logger(QString command){
     else {
 
         QMessageBox::information(this, "Error", "Unable to open log file");
+    }
+}
+
+void Playground::Serialer(QString instruction){
+    if(hw_is_available && hw->isWritable()){
+        hw->write(qPrintable(instruction));
     }
 }
