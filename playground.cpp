@@ -27,6 +27,7 @@ Playground::Playground(QWidget *parent) :
     ui(new Ui::Playground)
 {
     ui->setupUi(this);
+    ui->tabWidget->setTabEnabled(1, false);
     QString hello = "Session started";
     Logger(hello);
 
@@ -139,6 +140,9 @@ void Playground::on_pbConnect_clicked()
         hw->setFlowControl(QSerialPort::NoFlowControl);
         QString connected = "Connected to " + hw_port_name;
         Logger(connected);
+        QMessageBox::information(this,"Success","Connection established to " + hw_port_name);
+        ui->tabWidget->setTabEnabled(1,true);
+        ui->tabWidget->setCurrentIndex(1);
     }
     else {
         QString connection_error = "Serial port not available";
