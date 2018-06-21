@@ -2,6 +2,7 @@
 #define PLAYGROUND_H
 
 #include <QDialog>
+#include <QDate>
 
 
 namespace Ui {
@@ -26,12 +27,15 @@ private slots:
 
     void on_pbStop_clicked();
 
-    void on_lineEditMaterialLength_textEdited(const QString &arg1);
-    void fTimer();
+    void on_lineEditMaterialLength_textEdited();
 
-    void on_pbCut_2_clicked();
+//    void fTimer();
 
     void on_pbConnect_clicked();
+
+    void Logger(QString command);
+
+    void Serialer(QString instruction);
 
 private:
     Ui::Playground *ui;
@@ -39,7 +43,9 @@ private:
     QSerialPort *hw;
     QString hw_port_name;
     bool hw_is_available;
-    float disc;
+    float disc = 0;
+    QDate date;
+
 };
 
 #endif // PLAYGROUND_H

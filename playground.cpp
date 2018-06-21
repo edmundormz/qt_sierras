@@ -5,28 +5,36 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QTimer>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QIODevice>
 
-void Playground::fTimer(){
-    if(hw_is_available && hw->isWritable()){
-        hw->write("a");
-        if(hw->isReadable()){
-            QByteArray datosLeidos = hw->read(2);
-            int ADC_Digital = datosLeidos.toHex().toInt(0,16);
-            float ADC_Flotante = (5*(float)ADC_Digital/1023);
-            //SOMETHING TO DO WITH SERIAL INFO
-        }
-    }
-}
+//void Playground::fTimer(){
+//    if(hw_is_available && hw->isWritable()){
+//        hw->write("a");
+//        if(hw->isReadable()){
+//            QByteArray datosLeidos = hw->read(2);
+//            //int ADC_Digital = datosLeidos.toHex().toInt(0,16);
+//            //float ADC_Flotante = (5*(float)ADC_Digital/1023);
+//            //SOMETHING TO DO WITH SERIAL INFO
+//        }
+//    }
+//}
 
 Playground::Playground(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Playground)
 {
     ui->setupUi(this);
+    ui->tabWidget->setTabEnabled(1, false);
+    QString hello = "Session started";
+    Logger(hello);
 
-    QTimer *cronometro = new QTimer(this);
-    connect(cronometro, SIGNAL(timeout()),this, SLOT(fTimer()));
-    cronometro->start(100);
+//    //Timer to check serial ports
+//    QTimer *cronometro = new QTimer(this);
+//    connect(cronometro, SIGNAL(timeout()),this, SLOT(fTimer()));
+//    cronometro->start(100);
 
     hw_is_available = false;
     hw_port_name = "";
@@ -56,19 +64,21 @@ Playground::~Playground()
 
 void Playground::on_pbExit_clicked()
 {
+    QString regards = "Session closed";
+    Logger(regards);
     hw->close();
     this->close();
 }
 
 void Playground::on_pbCut_clicked()
 {
-    //qDebug() << "remaining =" << remaining;
     if(ui->comboBoxDiscType->currentText() == "3 mm"
             && ui->comboBoxMaterialType->currentText() == "Metal"){
-        QMessageBox::information(this,"Error","Unnapropiate disc for metal");
+        QString error_message = "Unnapropiate disc for metal";
+        QMessageBox::information(this,"Error", error_message);
+        Logger(error_message);
     }
     else {
-        disc = 0;
         switch (ui->comboBoxDiscType->currentIndex()){
         case 0:
             disc = 1;
@@ -84,14 +94,18 @@ void Playground::on_pbCut_clicked()
         float to_cut = ui->lineEditCutLength->text().toFloat();
         //Command log
         QString command;
-        command += "D" + QString::number(disc);
-        command += "M" + QString::number(ui->comboBoxMaterialType->currentIndex());
-        command += "C" + ui->lineEditCutLength->text();
+        command += "D" + QString::number(disc) + ",";
+        command += "M" + QString::number(ui->comboBoxMaterialType->currentIndex()) + ",";
+        command += "C" + ui->lineEditCutLength->text() + ",";
+        command += "R" + ui->lbRemainingMaterial->text();
         ui->lbCommand->setText(command);
+        Logger(command);
 
         if(to_cut < remaining){
             remaining = remaining - disc - to_cut;
             ui->lbRemainingMaterial->setText(QString::number(remaining));
+            Serialer("A1111");
+            Logger("Cutting at " + QDateTime::currentDateTime().toString());
             QMessageBox::information(this,"Success","Cutting material");
         }
         else {
@@ -102,11 +116,13 @@ void Playground::on_pbCut_clicked()
 
 void Playground::on_pbStop_clicked()
 {
+    Serialer("A0000");
+    Logger("Stopped at " + QDateTime::currentDateTime().toString());
     QMessageBox::information(this,"System Stopped","Turning off system");
 }
 
 
-void Playground::on_lineEditMaterialLength_textEdited(const QString &arg1)
+void Playground::on_lineEditMaterialLength_textEdited()
 {
     remaining = ui->lineEditMaterialLength->text().toFloat();
 }
@@ -125,8 +141,44 @@ void Playground::on_pbConnect_clicked()
         hw->setParity(QSerialPort::NoParity);
         hw->setStopBits(QSerialPort::OneStop);
         hw->setFlowControl(QSerialPort::NoFlowControl);
+        QString connected = "Connected to " + hw_port_name;
+        Logger(connected);
+        QMessageBox::information(this,"Success","Connection established to " + hw_port_name);
+        ui->tabWidget->setTabEnabled(1,true);
+        ui->tabWidget->setCurrentIndex(1);
     }
     else {
-        QMessageBox::information(this,"Error","Serial port not available");
+        QString connection_error = "Serial port not available";
+        QMessageBox::information(this, "Error", connection_error);
+        Logger(connection_error);
+    }
+}
+
+void Playground::Logger(QString command){
+    QString current_day = QString::number(date.currentDate().dayOfYear());
+    QString logs_dir_path = "/home/hecmundo/qt_logs";
+
+    //Check if logs directory exists
+    if (!QDir(logs_dir_path).exists()){
+        QDir().mkdir(logs_dir_path);
+    }
+    //Check if current log file exists
+    QFile log_path(logs_dir_path + "/log_" + current_day + ".csv");
+    if (log_path.open(QIODevice::WriteOnly | QIODevice::Append)){
+        QTextStream out_log(&log_path);
+        QString log = command + "_" + current_day + "\n";
+        out_log << log;
+        log_path.flush();
+        log_path.close();
+    }
+    else {
+
+        QMessageBox::information(this, "Error", "Unable to open log file");
+    }
+}
+
+void Playground::Serialer(QString instruction){
+    if(hw_is_available && hw->isWritable()){
+        hw->write(qPrintable(instruction));
     }
 }
